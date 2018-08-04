@@ -110,19 +110,21 @@ class App extends Component<Props, State> {
     this.setState({ data });
   };
 
+  openUploadDialog = () => {
+    if (this.dropzone.current) {
+      this.dropzone.current.open();
+    } else {
+      this.setState({
+        errorMessage: "Upload is not available"
+      });
+    }
+  };
+
   handleUploadButtonClick = () => {
     // Opening the upload dialog is delayed because opening upload dialog is
     // synchronous. requestAnimationFrame() won't do because then the browser will
     // ignore the dialog request.
-    setTimeout(() => {
-      if (this.dropzone.current) {
-        this.dropzone.current.open();
-      } else {
-        this.setState({
-          errorMessage: "Upload is not available"
-        });
-      }
-    }, RIPPLE_ANIMATION_DURATION);
+    setTimeout(this.openUploadDialog, RIPPLE_ANIMATION_DURATION);
   };
 
   handleSnackbarHide = () => {
@@ -154,9 +156,10 @@ class App extends Component<Props, State> {
                 activeClassName="active"
                 onDropAccepted={this.handleDropAccepted}
                 ref={this.dropzone}
+                disableClick
               >
                 {data === null ? (
-                  <div className="helper">
+                  <div className="helper" onClick={this.openUploadDialog}>
                     <Typography use="subtitle1">
                       Drop trace file here
                     </Typography>
