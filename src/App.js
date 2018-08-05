@@ -50,17 +50,20 @@ function mapPyinstrumentOutputToData(
   return data;
 }
 
+type FileReaderProgressEvent = { target: FileReader };
+
 function readFileAsText(file: File): Promise<string> {
   const fileReader = new FileReader();
   const promise = new Promise((resolve, reject) => {
-    fileReader.onload = event => {
+    fileReader.onload = (event: FileReaderProgressEvent) => {
       resolve(event.target.result);
     };
-    fileReader.onerror = event => {
+    fileReader.onerror = (event: FileReaderProgressEvent) => {
       reject(event.target.error);
     };
   });
   fileReader.readAsText(file);
+  // $FlowFixMe
   return promise;
 }
 
