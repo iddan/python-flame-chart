@@ -76,6 +76,14 @@ type State = {|
   errorMessage: string | null
 |};
 
+const setQuery = (partialQuery: {
+  [key: string | number]: string | number | boolean
+}) => {
+  const nextQuery = { ...partialQuery, ...partialQuery };
+  const nextURL = `?${String(new URLSearchParams(nextQuery))}`;
+  window.history.pushState({}, "", nextURL);
+};
+
 class App extends Component<Props, State> {
   state = {
     data: null,
@@ -84,33 +92,60 @@ class App extends Component<Props, State> {
 
   dropzone = React.createRef();
 
-  handleDropAccepted = async (files: File[]) => {
-    const [file] = files;
-    let rawInstrumentOutput: string;
+  handleRawPyinstrumentOutput = (rawPyinstrumentOutput: string) => {
     let pyinstrumentOutput: PyinstrumentOutput;
     let data: FlameGraphData;
-    /** @todo use snack bar */
     try {
-      rawInstrumentOutput = await readFileAsText(file);
+      pyinstrumentOutput = JSON.parse(rawPyinstrumentOutput);
     } catch (error) {
-      this.setState({ errorMessage: "Failed to read provided file" });
-      return;
-    }
-    try {
-      pyinstrumentOutput = JSON.parse(rawInstrumentOutput);
-    } catch (error) {
-      this.setState({ errorMessage: "Provided file is not a valid JSON file" });
+      this.setState({ errorMessage: "Provided data is not a valid JSON" });
       return;
     }
     try {
       data = mapPyinstrumentOutputToData(pyinstrumentOutput);
     } catch (error) {
       this.setState({
-        errorMessage: "Provided JSON file is not a valid trace output file"
+        errorMessage: "Provided JSON data is not a valid trace output"
       });
       return;
     }
+    setQuery({ data: encodeURIComponent(JSON.stringify(data)) });
     this.setState({ data });
+  };
+
+  componentDidMount() {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has("data")) {
+      const encodedRawData = searchParams.get("data");
+      const rawData = decodeURIComponent(encodedRawData);
+      let data: FlameGraphData;
+      try {
+        data = JSON.parse(rawData);
+      } catch (error) {
+        this.setState({
+          errorMessage: "Provided data is not a valid JSON"
+        });
+        return;
+      }
+      this.setState({ data });
+    }
+    // $FlowFixMe
+    document.addEventListener("paste", event => {
+      const rawPyinstrumentOutput = event.clipboardData.getData("text");
+      this.handleRawPyinstrumentOutput(rawPyinstrumentOutput);
+    });
+  }
+
+  handleDropAccepted = async (files: File[]) => {
+    const [file] = files;
+    let rawPyinstrumentOutput: string;
+    try {
+      rawPyinstrumentOutput = await readFileAsText(file);
+    } catch (error) {
+      this.setState({ errorMessage: "Failed to read provided data" });
+      return;
+    }
+    this.handleRawPyinstrumentOutput(rawPyinstrumentOutput);
   };
 
   openUploadDialog = () => {
@@ -169,11 +204,13 @@ class App extends Component<Props, State> {
                     <Typography use="body2">Or click to select</Typography>
                   </div>
                 ) : (
-                  <FlameGraph
-                    data={data}
-                    height={size.height}
-                    width={size.width}
-                  />
+                  Boolean(size.height && size.width) && (
+                    <FlameGraph
+                      data={data}
+                      height={size.height}
+                      width={size.width}
+                    />
+                  )
                 )}
                 <div className="drop-highlight">
                   <Card className="drop-helper">
