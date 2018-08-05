@@ -151,7 +151,7 @@ class App extends Component<Props, State> {
           </TopAppBarRow>
         </TopAppBar>
         <SizeMe monitorHeight>
-          {({ size }) => (
+          {({ size }: { size: { width: number, height: number } }) => (
             <main>
               {/** @todo allow reuploading */}
               <Dropzone
