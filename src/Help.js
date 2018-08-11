@@ -49,22 +49,24 @@ class Help extends Component<Props, State> {
           {activeTabIndex === 0 && (
             <pre>
               <code>
-                python -m pyinstrument script.py --renderer json | pbcopy;
+                {`pip install --upgrade pyinstrument;
+python -m pyinstrument script.py --renderer json | pbcopy;`}
               </code>
             </pre>
           )}
           {activeTabIndex === 1 && (
             <pre>
               <code>
-                python -m pyinstrument script.py --renderer json | xclip -sel
-                clip;
+                {`pip install --upgrade pyinstrument;
+python -m pyinstrument script.py --renderer json | xclip -sel clip;`}
               </code>
             </pre>
           )}
           {activeTabIndex === 2 && (
             <pre>
               <code>
-                python -m pyinstrument script.py --renderer json | clip;
+                {`pip install --upgrade pyinstrument;
+python -m pyinstrument script.py --renderer json | clip;`}
               </code>
             </pre>
           )}

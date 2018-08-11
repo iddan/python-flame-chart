@@ -18,7 +18,6 @@ import {
   DialogFooterButton,
   DialogBackdrop
 } from "rmwc/Dialog";
-import { TabBar, Tab } from "rmwc/Tabs";
 import { Snackbar } from "rmwc/Snackbar";
 import { Card } from "rmwc/Card";
 import { Typography } from "rmwc/Typography";
@@ -219,7 +218,6 @@ class App extends Component<Props, State> {
         <SizeMe monitorHeight>
           {({ size }: { size: { width: number, height: number } }) => (
             <main>
-              {/** @todo allow reuploading */}
               <Dropzone
                 className="Dropzone"
                 activeClassName="active"
