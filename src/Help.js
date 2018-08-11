@@ -91,7 +91,7 @@ python -m pyinstrument script.py --renderer json | clip;`;
         />
         <Typography use="body" tag="p">
           Or drop trace file or{" "}
-          <Button onClick={openUploadDialog}>click to select</Button>
+          <Button onClick={openUploadDialog}>click to select one</Button>
         </Typography>
       </div>
     );
