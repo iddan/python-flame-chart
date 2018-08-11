@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "clipboard-polyfill": "^2.5.2",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-dropzone": "^4.2.13",

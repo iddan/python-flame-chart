@@ -3,7 +3,8 @@
 import React, { Component } from "react";
 import { TabBar, Tab } from "rmwc/Tabs";
 import Typography from "rmwc/Typography";
-import Button from "rmwc/Button";
+import { Button, ButtonIcon } from "rmwc/Button";
+import { writeTextToClipboard } from "./util";
 import pcPaste from "./PC-paste.svg";
 import macOSPaste from "./macOS-paste.svg";
 import "@material/typography/dist/mdc.typography.css";
@@ -27,9 +28,36 @@ class Help extends Component<Props, State> {
     event.stopPropagation();
   };
 
+  getCommands = (): ?string => {
+    const { activeTabIndex } = this.state;
+    switch (activeTabIndex) {
+      case 0: {
+        return `pip install --upgrade pyinstrument;
+python -m pyinstrument script.py --renderer json | pbcopy;`;
+      }
+      case 1: {
+        return `pip install --upgrade pyinstrument;
+python -m pyinstrument script.py --renderer json | xclip -sel clip;`;
+      }
+      case 2: {
+        return `pip install --upgrade pyinstrument;
+python -m pyinstrument script.py --renderer json | clip;`;
+      }
+      default: {
+        /* should never get here */
+        break;
+      }
+    }
+  };
+
+  copyCommands = () => {
+    writeTextToClipboard(this.getCommands());
+  };
+
   render() {
     const { openUploadDialog } = this.props;
     const { activeTabIndex } = this.state;
+
     return (
       <div className="Help">
         <div onClick={this.blockClick}>
@@ -46,30 +74,13 @@ class Help extends Component<Props, State> {
           Run in your terminal
         </Typography>
         <div className="code-example">
-          {activeTabIndex === 0 && (
-            <pre>
-              <code>
-                {`pip install --upgrade pyinstrument;
-python -m pyinstrument script.py --renderer json | pbcopy;`}
-              </code>
-            </pre>
-          )}
-          {activeTabIndex === 1 && (
-            <pre>
-              <code>
-                {`pip install --upgrade pyinstrument;
-python -m pyinstrument script.py --renderer json | xclip -sel clip;`}
-              </code>
-            </pre>
-          )}
-          {activeTabIndex === 2 && (
-            <pre>
-              <code>
-                {`pip install --upgrade pyinstrument;
-python -m pyinstrument script.py --renderer json | clip;`}
-              </code>
-            </pre>
-          )}
+          <Button onClick={this.copyCommands}>
+            <ButtonIcon use="file_copy" />
+            Copy
+          </Button>
+          <pre>
+            <code>{this.getCommands()}</code>
+          </pre>
         </div>
         <Typography use="body" tag="p">
           Print with your keyboard

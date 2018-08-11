@@ -1,9 +1,17 @@
 .Help .code-example {
   --mdc-theme-text-primary-on-background: white;
   --mdc-theme-text-primary-on-light: white;
+  --mdc-theme-primary: white;
   --mdc-theme-text-secondary-on-background: rgba(255, 255, 255, 0.54);
   background: #172233;
   color: var(--mdc-theme-text-primary-on-background);
+  position: relative;
+}
+
+.Help .code-example .mdc-button {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .Help pre {
