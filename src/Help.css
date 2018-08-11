@@ -1,0 +1,31 @@
+.Help .code-example {
+  --mdc-theme-text-primary-on-background: white;
+  --mdc-theme-text-primary-on-light: white;
+  --mdc-theme-text-secondary-on-background: rgba(255, 255, 255, 0.54);
+  background: #172233;
+  color: var(--mdc-theme-text-primary-on-background);
+}
+
+.Help pre {
+  margin: 0;
+}
+
+.Help code {
+  display: block;
+  padding: 32px 16px;
+  margin: 0 16px;
+  box-sizing: border-box;
+  font-family: "Roboto Mono", monospace;
+  font-size: 16px;
+}
+
+.Help .paste-graphic {
+  width: 200px;
+  margin: auto;
+  display: block;
+}
+
+.Help p .mdc-button {
+  font: inherit;
+  text-transform: inherit;
+}

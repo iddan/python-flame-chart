@@ -10,20 +10,32 @@ import {
   TopAppBarTitle,
   TopAppBarActionItem
 } from "rmwc/TopAppBar";
+import {
+  Dialog,
+  DialogSurface,
+  DialogBody,
+  DialogFooter,
+  DialogFooterButton,
+  DialogBackdrop
+} from "rmwc/Dialog";
+import { TabBar, Tab } from "rmwc/Tabs";
 import { Snackbar } from "rmwc/Snackbar";
 import { Card } from "rmwc/Card";
 import { Typography } from "rmwc/Typography";
 import { SizeMe } from "react-sizeme";
+import Help from "./Help";
 import "@material/typography/dist/mdc.typography.css";
 import "@material/top-app-bar/dist/mdc.top-app-bar.css";
 import "@material/card/dist/mdc.card.css";
 import "@material/snackbar/dist/mdc.snackbar.css";
-import "@material/fab/dist/mdc.fab.css";
+import "@material/dialog/dist/mdc.dialog.css";
+import "@material/button/dist/mdc.button.css";
 import "./App.css";
 
 export type FlameGraphData = {|
   name: string,
   value: number,
+  tooltip?: string,
   children?: Array<FlameGraphData>
 |};
 
@@ -40,7 +52,10 @@ function mapPyinstrumentOutputToData(
 ): FlameGraphData {
   const data: FlameGraphData = {
     name: pyinstrumentOutput.function,
-    value: pyinstrumentOutput.time
+    value: pyinstrumentOutput.time,
+    tooltip: `${pyinstrumentOutput.time.toFixed(2)}ms ${
+      pyinstrumentOutput.function
+    }`
   };
   if (pyinstrumentOutput.children.length > 0) {
     data.children = pyinstrumentOutput.children.map(
@@ -73,7 +88,8 @@ type Props = {||};
 
 type State = {|
   data: FlameGraphData | null,
-  errorMessage: string | null
+  errorMessage: string | null,
+  tutorialShown: boolean
 |};
 
 const setQuery = (partialQuery: {
@@ -87,7 +103,8 @@ const setQuery = (partialQuery: {
 class App extends Component<Props, State> {
   state = {
     data: null,
-    errorMessage: null
+    errorMessage: null,
+    tutorialShown: false
   };
 
   dropzone = React.createRef();
@@ -169,16 +186,30 @@ class App extends Component<Props, State> {
     this.setState({ errorMessage: null });
   };
 
+  showTutorial = () => {
+    this.setState({ tutorialShown: true });
+  };
+
+  hideTutorial = () => {
+    this.setState({ tutorialShown: false });
+  };
+
   render() {
-    const { data, errorMessage } = this.state;
+    const { data, errorMessage, tutorialShown } = this.state;
+    const hasData = Boolean(data);
     return (
       <div className="App">
-        <TopAppBar fixed>
+        <TopAppBar fixed prominent={!hasData}>
           <TopAppBarRow>
             <TopAppBarSection alignStart>
               <TopAppBarTitle>Python Flame Chart</TopAppBarTitle>
             </TopAppBarSection>
             <TopAppBarSection alignEnd>
+              {hasData && (
+                <TopAppBarActionItem onClick={this.showTutorial}>
+                  help
+                </TopAppBarActionItem>
+              )}
               <TopAppBarActionItem onClick={this.handleUploadButtonClick}>
                 file_upload
               </TopAppBarActionItem>
@@ -197,12 +228,9 @@ class App extends Component<Props, State> {
                 disableClick
               >
                 {data === null ? (
-                  <div className="helper" onClick={this.openUploadDialog}>
-                    <Typography use="subtitle1">
-                      Drop trace file here
-                    </Typography>
-                    <Typography use="body2">Or click to select</Typography>
-                  </div>
+                  <Card className="helper">
+                    <Help openUploadDialog={this.handleUploadButtonClick} />
+                  </Card>
                 ) : (
                   Boolean(size.height && size.width) && (
                     <FlameGraph
@@ -221,6 +249,19 @@ class App extends Component<Props, State> {
             </main>
           )}
         </SizeMe>
+        <Dialog open={tutorialShown} onClose={this.hideTutorial}>
+          <DialogSurface>
+            <DialogBody>
+              <Help openUploadDialog={this.handleUploadButtonClick} />
+            </DialogBody>
+            <DialogFooter>
+              <DialogFooterButton onClick={this.hideTutorial}>
+                Close
+              </DialogFooterButton>
+            </DialogFooter>
+          </DialogSurface>
+          <DialogBackdrop />
+        </Dialog>
         <Snackbar
           show={Boolean(errorMessage)}
           message={errorMessage}

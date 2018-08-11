@@ -5976,9 +5976,9 @@ react-error-overlay@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-4.0.0.tgz#d198408a85b4070937a98667f500c832f86bd5d4"
 
-react-flame-graph@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/react-flame-graph/-/react-flame-graph-1.0.3.tgz#b721b5b52fd49460edc1a9811e8862b6b8a78a69"
+react-flame-graph@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-flame-graph/-/react-flame-graph-1.1.0.tgz#e4bf476d65136c9c4990a48951df922c433c580a"
   dependencies:
     memoize-one "^3.1.1"
     react-window "^1"
