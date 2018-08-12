@@ -91,12 +91,14 @@ type State = {|
   tutorialShown: boolean
 |};
 
-const setQuery = (partialQuery: {
-  [key: string | number]: string | number | boolean
-}) => {
-  const nextQuery = { ...partialQuery, ...partialQuery };
-  const nextURL = `?${String(new URLSearchParams(nextQuery))}`;
-  window.history.pushState({}, "", nextURL);
+const getRawDataFromSearch = (): string | null => {
+  const search = new URLSearchParams(window.location.search);
+  if (!search.has("data")) {
+    return null;
+  }
+  const encodedRawData = search.get("data");
+  const rawData = decodeURIComponent(encodedRawData);
+  return rawData;
 };
 
 class App extends Component<Props, State> {
@@ -107,6 +109,22 @@ class App extends Component<Props, State> {
   };
 
   dropzone = React.createRef();
+
+  setData = (data: $PropertyType<State, "data">) => {
+    this.setState({ data });
+
+    const nextSearch = new URLSearchParams(window.location.search);
+
+    if (data === null) {
+      nextSearch.delete("data");
+    } else {
+      nextSearch.set("data", encodeURIComponent(JSON.stringify(data)));
+    }
+
+    const nextURL = `?${String(nextSearch)}`;
+
+    window.history.pushState({}, "", nextURL);
+  };
 
   handleRawPyinstrumentOutput = (rawPyinstrumentOutput: string) => {
     let pyinstrumentOutput: PyinstrumentOutput;
@@ -125,15 +143,12 @@ class App extends Component<Props, State> {
       });
       return;
     }
-    setQuery({ data: encodeURIComponent(JSON.stringify(data)) });
-    this.setState({ data });
+    this.setData(data);
   };
 
   componentDidMount() {
-    const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.has("data")) {
-      const encodedRawData = searchParams.get("data");
-      const rawData = decodeURIComponent(encodedRawData);
+    const rawData = getRawDataFromSearch();
+    if (rawData !== null) {
       let data: FlameGraphData;
       try {
         data = JSON.parse(rawData);
@@ -149,6 +164,16 @@ class App extends Component<Props, State> {
     document.addEventListener("paste", event => {
       const rawPyinstrumentOutput = event.clipboardData.getData("text");
       this.handleRawPyinstrumentOutput(rawPyinstrumentOutput);
+    });
+
+    // Handle browser history manipulation
+    window.addEventListener("popstate", event => {
+      const rawData = getRawDataFromSearch();
+      try {
+        this.setState({ data: rawData === null ? null : JSON.parse(rawData) });
+      } catch (error) {
+        return;
+      }
     });
   }
 
@@ -193,6 +218,10 @@ class App extends Component<Props, State> {
     this.setState({ tutorialShown: false });
   };
 
+  clearData = () => {
+    this.setData(null);
+  };
+
   render() {
     const { data, errorMessage, tutorialShown } = this.state;
     const hasData = Boolean(data);
@@ -201,7 +230,9 @@ class App extends Component<Props, State> {
         <TopAppBar fixed prominent={!hasData}>
           <TopAppBarRow>
             <TopAppBarSection alignStart>
-              <TopAppBarTitle>Python Flame Chart</TopAppBarTitle>
+              <TopAppBarTitle onClick={this.clearData}>
+                Python Flame Chart
+              </TopAppBarTitle>
             </TopAppBarSection>
             <TopAppBarSection alignEnd>
               {hasData && (
