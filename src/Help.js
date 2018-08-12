@@ -15,6 +15,9 @@ import "./Help.css";
 type Props = { openUploadDialog: () => void };
 type State = { activeTabIndex: number };
 
+const macOSPasteAlt = "cmd + v";
+const pcPasteAlt = "ctrl + v";
+
 class Help extends Component<Props, State> {
   state = { activeTabIndex: 0 };
 
@@ -58,13 +61,9 @@ python -m pyinstrument script.py --renderer json | clip;`;
     const { openUploadDialog } = this.props;
     const { activeTabIndex } = this.state;
 
-    return (
-      <div className="Help">
+    return <div className="Help">
         <div onClick={this.blockClick}>
-          <TabBar
-            activeTabIndex={activeTabIndex}
-            onChange={this.handleTabBarChange}
-          >
+          <TabBar activeTabIndex={activeTabIndex} onChange={this.handleTabBarChange}>
             <Tab>Mac OS</Tab>
             <Tab>Linux</Tab>
             <Tab>Windows</Tab>
@@ -85,16 +84,13 @@ python -m pyinstrument script.py --renderer json | clip;`;
         <Typography use="body" tag="p">
           Print with your keyboard
         </Typography>
-        <img
-          className="paste-graphic"
-          src={activeTabIndex === 0 ? macOSPaste : pcPaste}
-        />
+        <img alt={activeTabIndex === 0 ? macOSPasteAlt : pcPasteAlt} className="paste-graphic" src={activeTabIndex === 0 ? macOSPaste : pcPaste} />
         <Typography use="body" tag="p">
-          Or drop trace file or{" "}
-          <Button onClick={openUploadDialog}>click to select one</Button>
+          Or drop trace file or <Button onClick={openUploadDialog}>
+            click to select one
+          </Button>
         </Typography>
-      </div>
-    );
+      </div>;
   }
 }
 
