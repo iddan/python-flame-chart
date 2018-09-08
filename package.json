@@ -16,9 +16,12 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generate-favicon": "node scripts/generate-favicon.js"
   },
   "devDependencies": {
-    "flow-bin": "^0.78.0"
+    "convert-svg-to-png": "^0.4.0",
+    "flow-bin": "^0.78.0",
+    "to-ico": "^1.1.5"
   }
 }
